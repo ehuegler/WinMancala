@@ -38,8 +38,8 @@ function applyState(state) {
 
   currState = state
 
-  whichCup = minimaxsearch(state, 5)
-  console.log(whichCup)
+  // whichCup = minimaxsearch(state, 5)
+  // console.log(whichCup)
 }
 
 
