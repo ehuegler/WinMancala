@@ -17,6 +17,7 @@ for (let cup of cups) {
 window.onload = reset()
 
 function applyState(state) {
+  // console.log(state)
   // update endzones
   let player0 = document.getElementById('player0')
   player0.textContent = state.player0
@@ -25,6 +26,7 @@ function applyState(state) {
 
   // update cups
   for (let cup of cups) {
+    cup.classList.remove('suggested')
     cup.textContent = state.cups[parseInt(cup.id)]
   }
 
@@ -38,8 +40,12 @@ function applyState(state) {
 
   currState = state
 
-  // whichCup = minimaxsearch(state, 5)
-  // console.log(whichCup)
+  whichCup = minimaxsearch(state, 6)[1]
+  console.log(whichCup)
+
+
+  // highlight that cup
+  cups[whichCup].classList.add('suggested')
 }
 
 
@@ -73,6 +79,8 @@ function transition(state, cup) {
 
   if (cup % 2 == 0) {
     // player 0 turn
+    newState.turn = 1
+
     let i = cup
     let dir = 1
     while (moving > 0) {
@@ -82,6 +90,9 @@ function transition(state, cup) {
         i = 13
         dir = -1
         moving--
+        if (moving === 0) {
+          newState.turn = 0
+        }
         continue
       }
       if (i < 0) {
@@ -94,19 +105,19 @@ function transition(state, cup) {
       moving--
     }
 
-    if (newState.cups[i] != 1) {
-      // dont go again
-      newState.turn = 1
-    } else {
+    let lastCup = i + 1
+    if (newState.cups[i] === 1 && newState.cups[lastCup] && i % 2 === 0) {
       // you get to steal
-      let x = newState.cups[i + 1]
-      newState.cups[i + 1] = 0
+      let x = newState.cups[lastCup]
+      newState.cups[lastCup] = 0
       newState.cups[i] = 0
       newState.player0 += 1 + x
     }
 
   } else {
     // player 1 turn
+    newState.turn = 0
+
     let i = cup
     let dir = -1
     while (moving > 0) {
@@ -121,6 +132,10 @@ function transition(state, cup) {
         i = -2
         dir = 1
         moving--
+
+        if (moving === 0) {
+          newState.turn = 1
+        }
         continue
       }
 
@@ -128,13 +143,11 @@ function transition(state, cup) {
       moving--
     }
 
-    if (newState.cups[i] != 1) {
-      // dont go again
-      newState.turn = 0
-    } else {
+    if (newState.cups[i] === 1 && i % 2 === 1) {
       // you get to steal
-      let x = newState.cups[i - 1]
-      newState.cups[i - 1] = 0
+      let lastCup = i - 1
+      let x = newState.cups[lastCup]
+      newState.cups[lastCup] = 0
       newState.cups[i] = 0
       newState.player1 += 1 + x
     }
@@ -142,14 +155,14 @@ function transition(state, cup) {
 
   // check if this is a win state
   let sum0 = 0
-  for (let i=0; i<12; i+=2) {
+  for (let i = 0; i < 12; i += 2) {
     sum0 += newState.cups[i]
   }
   let sum1 = 0
-  for (let i=1; i<12; i+=2) {
+  for (let i = 1; i < 12; i += 2) {
     sum1 += newState.cups[i]
   }
-  
+
   if (sum0 === 0 || sum1 === 0) {
     // player 0 is out of moves
     newState.player0 += sum0
@@ -166,50 +179,48 @@ function reset() {
 }
 
 function getLegalMoves(state) {
-  cups = []
-  for (let i = 0; i<12; i++) {
+  let moves = []
+  for (let i = 0; i < 12; i++) {
     if (i % 2 == state.turn && state.cups[i] > 0) {
-      cups.push(i)
+      moves.push(i)
     }
   }
-  return cups
+  return moves
 }
 
 function minimaxsearch(state, depth) {
-  if (state.turn == 0) {
-    return maximize(state, depth)
-  }
-  if (state.turn == 1) {
-    return minimize(state, depth)
-  }
-}
-
-function minimize(state, depth) {
-  if (state.isGoal || depth == 0) {
-    return state.player0
+  if (depth == 0 || state.isGoal) {
+    return [state.player0 - state.player1]
   }
 
-  let minScore = 100
-  for (let cup of getLegalMoves(state)) {
-    score = minimaxsearch(transition(state, cup), depth - 1)
-    if (score < minScore) {
-      minScore = score
+  let value = 0
+  let bestMove = -1
+  let legalMoves = getLegalMoves(state)
+
+  // if player0's turn
+  if (state.turn === 0) {
+    value = -100000000
+    for (let move of legalMoves) {
+      result = minimaxsearch(transition(state, move), depth - 1)[0]
+      if (result > value) {
+        value = result
+        bestMove = move
+      }
     }
   }
-  return minScore
-}
 
-function maximize(state, depth) {
-  if (state.isGoal || depth == 0) {
-    return state.player0
-  }
-
-  let maxScore = 0
-  for (let cup of getLegalMoves(state)) {
-    score = minimaxsearch(transition(state, cup), depth - 1)
-    if (score > maxScore) {
-      maxScore = score
+  // if player0's turn
+  if (state.turn === 1) {
+    value = 100000000
+    for (let move of legalMoves) {
+      result = minimaxsearch(transition(state, move), depth - 1)[0]
+      if (result < value) {
+        value = result
+        bestMove = move
+      }
     }
   }
-  return maxScore
+
+
+  return [value, bestMove]
 }
