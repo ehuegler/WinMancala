@@ -40,7 +40,7 @@ function applyState(state) {
 
   currState = state
 
-  whichCup = minimaxsearch(state, 6)[1]
+  whichCup = minimaxsearch(state, 7)[1]
   console.log(whichCup)
 
 
@@ -188,7 +188,7 @@ function getLegalMoves(state) {
   return moves
 }
 
-function minimaxsearch(state, depth) {
+function minimaxsearch(state, depth, alpha, beta) {
   if (depth == 0 || state.isGoal) {
     return [state.player0 - state.player1]
   }
@@ -201,22 +201,36 @@ function minimaxsearch(state, depth) {
   if (state.turn === 0) {
     value = -100000000
     for (let move of legalMoves) {
-      result = minimaxsearch(transition(state, move), depth - 1)[0]
+      result = minimaxsearch(transition(state, move), depth - 1, alpha, beta)[0]
       if (result > value) {
         value = result
         bestMove = move
       }
+      if (value >= beta) {
+        break
+      } else {
+        if (value > alpha) {
+          alpha = value
+        }
+      }
     }
   }
 
-  // if player0's turn
+  // if player1's turn
   if (state.turn === 1) {
     value = 100000000
     for (let move of legalMoves) {
-      result = minimaxsearch(transition(state, move), depth - 1)[0]
+      result = minimaxsearch(transition(state, move), depth - 1, alpha, beta)[0]
       if (result < value) {
         value = result
         bestMove = move
+      }
+      if (value <= alpha) {
+        break
+      } else {
+        if (value < beta) {
+          beta = value
+        }
       }
     }
   }
