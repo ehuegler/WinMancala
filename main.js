@@ -40,7 +40,7 @@ function applyState(state) {
 
   currState = state
 
-  whichCup = minimaxsearch(state, 7)[1]
+  whichCup = minimaxsearch(state, 8)[1]
   console.log(whichCup)
 
 
@@ -167,6 +167,9 @@ function transition(state, cup) {
     // player 0 is out of moves
     newState.player0 += sum0
     newState.player1 += sum1
+  }
+
+  if (newState.player0 > 24 || newState.player1 > 24) {
     newState.isGoal = true
   }
 
