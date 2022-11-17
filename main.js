@@ -1,6 +1,9 @@
 let cups = document.getElementsByClassName('cup')
+let winnerText = document.getElementsByClassName('winner')[0]
 let running = false
 let currState = {}
+
+let stateMap = new Map()
 
 let initState = {
   player1: 0,
@@ -30,22 +33,28 @@ function applyState(state) {
     cup.textContent = state.cups[parseInt(cup.id)]
   }
 
-  if (currState.isGoal) {
+  // console.log(state.isGoal)
+  if (state.isGoal) {
+    // console.log('1')
     if (currState.player1 > currState.player0) {
       console.log('Player 1 Wins!')
+      winnerText.textContent = 'Player 2 Wins!'
     } else {
       console.log('Player 0 Wins!')
+      winnerText.textContent = 'Player 1 Wins!'
     }
+  } else {
+    // console.log('1')
+    winnerText.textContent = ''
+    
+    currState = state
+
+    whichCup = minimaxsearch(state, 5)[1]
+    // console.log(whichCup)
+
+    // highlight that cup
+    cups[whichCup].classList.add('suggested')
   }
-
-  currState = state
-
-  whichCup = minimaxsearch(state, 8)[1]
-  console.log(whichCup)
-
-
-  // highlight that cup
-  cups[whichCup].classList.add('suggested')
 }
 
 
@@ -192,6 +201,12 @@ function getLegalMoves(state) {
 }
 
 function minimaxsearch(state, depth, alpha, beta) {
+  let serialized = JSON.stringify(state)
+
+  if (stateMap.has(serialized)) {
+    return stateMap.get(serialized)
+  }
+
   if (depth == 0 || state.isGoal) {
     return [state.player0 - state.player1]
   }
@@ -238,6 +253,6 @@ function minimaxsearch(state, depth, alpha, beta) {
     }
   }
 
-
+  stateMap.set(serialized, [value, bestMove])
   return [value, bestMove]
 }
