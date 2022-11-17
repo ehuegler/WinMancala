@@ -29,6 +29,13 @@ header img {
 
 footer {
   padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.github {
+  width: 30px;
+  padding-top: 15px;
 }
 
 main {
@@ -72,9 +79,17 @@ main {
 }
 
 .cup {
-
+  min-width: 30px;
+  border: solid 2px #ffffff00;
 }
 
 .suggested {
   border: solid 2px blue;
+}
+
+.winner {
+  font-size: 40px;
+  font-weight: 700;
+  text-align: center;
+  padding-bottom: 20px;
 }

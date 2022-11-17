@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Mancala</title>
+  <title>Win Mancala</title>
 
   <link rel="stylesheet" href="style.css">
 
@@ -15,7 +15,7 @@
 <body>
   <header>
     <img src="GamePigeon.png" alt="GamePigeon Logo">
-    <h1>Mancala!</h1>
+    <h1>Win Mancala</h1>
   </header>
 
   <main>
@@ -23,6 +23,10 @@
     <button class="reset" id="restart" onclick="reset()">
       Reset
     </button>
+
+    <div class="winner">
+      Player 1 Wins!
+    </div>
 
     <div class="board" id="board">
       <div class="endzone"  id="player1">endzone</div>
@@ -44,7 +48,10 @@
   </main>
 
   <footer>
-    I just really wanted to beat Zoe
+    <p>An ideal play engine for the GamePigeon Mancala game.</p>
+    <a href="https://github.com/ehuegler/MemeCala">
+      <img class="github" src="/GitHub-Mark-Light-64px.png" alt="Check out the source code on GitHub">
+    </a>
   </footer>
 
   <script src="main.js"></script>
